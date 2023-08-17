@@ -356,7 +356,7 @@ class Model:
             if any(kwargs):
                 LOGGER.warning('WARNING ⚠️ using HUB training arguments, ignoring local training arguments.')
             kwargs = self.session.train_args
-        check_pip_update_available()
+        # check_pip_update_available()
         overrides = self.overrides.copy()
         if kwargs.get('cfg'):
             LOGGER.info(f"cfg file passed. Overriding default params with {kwargs['cfg']}.")
