@@ -108,9 +108,7 @@ class HT(nn.Module):
         self.r, self.c, self.h, self.w = vote_index.size()
         self.norm = max(self.r, self.c)
 
-        self.vote_index = nn.Parameter(
-            vote_index.view(self.r * self.c, self.h * self.w), requires_grad=False
-        )
+        self.vote_index = vote_index.view(self.r * self.c, self.h * self.w)
         self.total = vote_index.sum(0).max()
 
     def forward(self, image):
@@ -123,6 +121,7 @@ class HT(nn.Module):
         #     )
         #     self.r, self.c, self.h, self.w = 32, 32, 46, 60
         #     self.norm = max(self.r, self.c)
+        self.vote_index = self.vote_index.to(image.device, image.dtype)
         HT_map = image @ self.vote_index
         ### normalization ###
         # HT_map = HT_map/self.total
@@ -136,9 +135,9 @@ class IHT(nn.Module):
     def __init__(self, vote_index):
         super(IHT, self).__init__()
         self.r, self.c, self.h, self.w = vote_index.size()
-        self.vote_index = self.vote_index = nn.Parameter(
-            vote_index.view(self.r * self.c, self.h * self.w).t(), requires_grad=False
-        )
+        self.vote_index = self.vote_index = vote_index.view(
+            self.r * self.c, self.h * self.w
+        ).t()
 
     def forward(self, input_HT):
         batch, channel, _, _ = input_HT.size()
@@ -151,6 +150,8 @@ class IHT(nn.Module):
         input_HT = input_HT.view(batch, channel, self.h * self.w).view(
             batch * channel, self.h * self.w
         )
+
+        self.vote_index = self.vote_index.to(input_HT.device, input_HT.dtype)
         IHT_map = input_HT @ self.vote_index
         IHT_map = IHT_map.view(batch, channel, self.r * self.c).view(
             batch, channel, self.r, self.c
