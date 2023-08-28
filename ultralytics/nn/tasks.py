@@ -709,20 +709,12 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
                 args[2] = make_divisible(min(args[2], max_channels) * width, 8)
         elif m is RTDETRDecoder:  # special case, channels arg must be passed in index 1
             args.insert(1, [ch[x] for x in f])
-        elif m is CAT_HTIHT:
+        elif m in [CAT_HTIHT, HTIHT]:
             c1, c2 = ch[f], args[0]
             r, c, theta, rho = args[1:]
-            vote_index = (
-                torch.from_numpy(
-                    hough_transform(rows=r, cols=c, theta_res=theta, rho_res=rho)
-                )
-                .float()
-                .contiguous()
-            )
             if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
                 c2 = make_divisible(min(c2, max_channels) * width, 8)
-
-            args = [vote_index, c1, c2]
+            args = [c1, c2, r, c, theta, rho]
         else:
             c2 = ch[f]
 

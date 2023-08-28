@@ -102,16 +102,23 @@ def make_conv_block(
     return nn.Sequential(*layers)
 
 
+vote_index_shape = None
+vote_index = None
+vote_index_t = None
+
+
 class HT(nn.Module):
-    def __init__(self, vote_index):
+    def __init__(self):
         super(HT, self).__init__()
-        self.r, self.c, self.h, self.w = vote_index.size()
+        global vote_index_shape, vote_index
+        self.r, self.c, self.h, self.w = vote_index_shape
         self.norm = max(self.r, self.c)
 
-        self.vote_index = vote_index.view(self.r * self.c, self.h * self.w)
+        vote_index = vote_index.view(self.r * self.c, self.h * self.w)
         self.total = vote_index.sum(0).max()
 
     def forward(self, image):
+        global vote_index
         batch, channel, _, _ = image.size()
         image = image.view(batch, channel, -1).view(batch * channel, -1)
         image = F.relu(image)
@@ -121,8 +128,8 @@ class HT(nn.Module):
         #     )
         #     self.r, self.c, self.h, self.w = 32, 32, 46, 60
         #     self.norm = max(self.r, self.c)
-        self.vote_index = self.vote_index.to(image.device, image.dtype)
-        HT_map = image @ self.vote_index
+        vote_index = vote_index.to(image.device, image.dtype)
+        HT_map = image @ vote_index
         ### normalization ###
         # HT_map = HT_map/self.total
         ### normalized by max(rows, cols)
@@ -132,14 +139,14 @@ class HT(nn.Module):
 
 
 class IHT(nn.Module):
-    def __init__(self, vote_index):
+    def __init__(self):
         super(IHT, self).__init__()
-        self.r, self.c, self.h, self.w = vote_index.size()
-        self.vote_index = self.vote_index = vote_index.view(
-            self.r * self.c, self.h * self.w
-        ).t()
+        global vote_index_shape, vote_index, vote_index_t
+        self.r, self.c, self.h, self.w = vote_index_shape
+        vote_index_t = vote_index.view(self.r * self.c, self.h * self.w).t().clone()
 
     def forward(self, input_HT):
+        global vote_index_t
         batch, channel, _, _ = input_HT.size()
         input_HT = F.relu(input_HT)
         # if input_HT.shape[2] == 10920:
@@ -151,8 +158,8 @@ class IHT(nn.Module):
             batch * channel, self.h * self.w
         )
 
-        self.vote_index = self.vote_index.to(input_HT.device, input_HT.dtype)
-        IHT_map = input_HT @ self.vote_index
+        vote_index_t = vote_index_t.to(input_HT.device, input_HT.dtype)
+        IHT_map = input_HT @ vote_index_t
         IHT_map = IHT_map.view(batch, channel, self.r * self.c).view(
             batch, channel, self.r, self.c
         )
@@ -161,8 +168,20 @@ class IHT(nn.Module):
 
 
 class HTIHT(nn.Module):
-    def __init__(self, vote_index, inplanes, outplanes):
+    def __init__(self, inplanes, outplanes, rows, cols, theta_res, rho_res):
         super(HTIHT, self).__init__()
+
+        global vote_index_shape, vote_index, vote_index_t
+        vote_index = (
+            torch.from_numpy(
+                hough_transform(
+                    rows=rows, cols=cols, theta_res=theta_res, rho_res=rho_res
+                )
+            )
+            .float()
+            .contiguous()
+        )
+        vote_index_shape = vote_index.size()
 
         self.conv1 = nn.Sequential(
             *make_conv_block(
@@ -187,8 +206,8 @@ class HTIHT(nn.Module):
 
         self.relu = nn.ReLU(inplace=True)
         self.tanh = nn.Tanh()
-        self.ht = HT(vote_index)
-        self.iht = IHT(vote_index)
+        self.ht = HT()
+        self.iht = IHT()
 
         filtersize = 4
         x = np.zeros(shape=((2 * filtersize + 1)))
@@ -220,17 +239,16 @@ class HTIHT(nn.Module):
 class CAT_HTIHT(nn.Module):
     def __init__(
         self,
-        vote_index,
         inplanes,
         outplanes,
-        # rows=128,
-        # cols=128,
-        # theta_res=3,
-        # rho_res=1,
+        rows=128,
+        cols=128,
+        theta_res=3,
+        rho_res=1,
     ):
         super(CAT_HTIHT, self).__init__()
 
-        self.htiht = HTIHT(vote_index, inplanes, outplanes)
+        self.htiht = HTIHT(inplanes, outplanes, rows, cols, theta_res, rho_res)
         self.bn = nn.BatchNorm2d(inplanes)
         self.relu = nn.ReLU(inplace=True)
         self.conv_cat = nn.Conv2d(
