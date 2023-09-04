@@ -21,6 +21,7 @@ from .head import Classify, Detect, Pose, RTDETRDecoder, Segment
 from .transformer import (AIFI, MLP, DeformableTransformerDecoder, DeformableTransformerDecoderLayer, LayerNorm2d,
                           MLPBlock, MSDeformAttn, TransformerBlock, TransformerEncoderLayer, TransformerLayer)
 from .HT import HT, IHT, HTIHT, CAT_HTIHT, hough_transform
+from .gabor_layers import GaborLayer, GaborLayerLearnable
 
 __all__ = ('Conv', 'Conv2', 'LightConv', 'RepConv', 'DWConv', 'DWConvTranspose2d', 'ConvTranspose', 'Focus',
            'GhostConv', 'ChannelAttention', 'SpatialAttention', 'CBAM', 'Concat', 'TransformerLayer',
@@ -28,5 +29,6 @@ __all__ = ('Conv', 'Conv2', 'LightConv', 'RepConv', 'DWConv', 'DWConvTranspose2d
            'C2f', 'C3x', 'C3TR', 'C3Ghost', 'GhostBottleneck', 'Bottleneck', 'BottleneckCSP', 'Proto', 'Detect',
            'Segment', 'Pose', 'Classify', 'TransformerEncoderLayer', 'RepC3', 'RTDETRDecoder', 'AIFI',
            'DeformableTransformerDecoder', 'DeformableTransformerDecoderLayer', 'MSDeformAttn', 'MLP',
-            'HT', 'IHT', 'HTIHT', 'CAT_HTIHT', 'hough_transform'
+            'HT', 'IHT', 'HTIHT', 'CAT_HTIHT', 'hough_transform',
+            'GaborLayer', 'GaborLayerLearnable'
             )

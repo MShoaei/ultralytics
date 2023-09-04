@@ -11,7 +11,8 @@ from ultralytics.nn.modules import (AIFI, C1, C2, C3, C3TR, SPP, SPPF, Bottlenec
                                     Classify, Concat, Conv, Conv2, ConvTranspose, Detect, DWConv, DWConvTranspose2d,
                                     Focus, GhostBottleneck, GhostConv, HGBlock, HGStem, Pose, RepC3, RepConv,
                                     RTDETRDecoder, Segment,
-                                    HT, IHT, HTIHT, CAT_HTIHT, hough_transform)
+                                    HT, IHT, HTIHT, CAT_HTIHT, hough_transform,
+                                    GaborLayer, GaborLayerLearnable)
 from ultralytics.utils import DEFAULT_CFG_DICT, DEFAULT_CFG_KEYS, LOGGER, colorstr, emojis, yaml_load
 from ultralytics.utils.checks import check_requirements, check_suffix, check_yaml
 from ultralytics.utils.loss import v8ClassificationLoss, v8DetectionLoss, v8PoseLoss, v8SegmentationLoss
@@ -709,12 +710,18 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
                 args[2] = make_divisible(min(args[2], max_channels) * width, 8)
         elif m is RTDETRDecoder:  # special case, channels arg must be passed in index 1
             args.insert(1, [ch[x] for x in f])
-        elif m in [CAT_HTIHT, HTIHT]:
+        elif m in (CAT_HTIHT, HTIHT):
             c1, c2 = ch[f], args[0]
             r, c, theta, rho = args[1:]
             if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
                 c2 = make_divisible(min(c2, max_channels) * width, 8)
             args = [c1, c2, r, c, theta, rho]
+        elif m in (GaborLayer, GaborLayerLearnable):
+            c1, c2 = ch[f], args[0]
+            if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
+                c2 = make_divisible(min(c2, max_channels) * width, 8)
+
+            args = [c1, c2, *args[1:]]
         else:
             c2 = ch[f]
 

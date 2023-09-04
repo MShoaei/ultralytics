@@ -8,6 +8,7 @@ Usage:
 
 import math
 import os
+import io
 import subprocess
 import time
 from copy import deepcopy
@@ -226,9 +227,9 @@ class BaseTrainer:
                 LOGGER.info(f"Freezing layer '{k}'")
                 v.requires_grad = False
             elif not v.requires_grad:
-                LOGGER.info(f"WARNING ⚠️ setting 'requires_grad=True' for frozen layer '{k}'. "
+                LOGGER.info(f"WARNING ⚠️ frozen layer '{k}' was not in frozen list. respecting the manual 'requires_grad=False'"
                             'See ultralytics.engine.trainer for customization of frozen layers.')
-                v.requires_grad = True
+                # v.requires_grad = True
 
         # Check AMP
         self.amp = torch.tensor(self.args.amp).to(self.device)  # True or False
@@ -387,7 +388,7 @@ class BaseTrainer:
                 self.ema.update_attr(self.model, include=['yaml', 'nc', 'args', 'names', 'stride', 'class_weights'])
                 final_epoch = (epoch + 1 == self.epochs) or self.stopper.possible_stop
 
-                if self.args.val or final_epoch:
+                if (self.args.val and (epoch%self.args.val_interval==0)) or final_epoch:
                     self.metrics, self.fitness = self.validate()
                 self.save_metrics(metrics={**self.label_loss_items(self.tloss), **self.metrics, **self.lr})
                 self.stop = self.stopper(epoch + 1, self.fitness)
@@ -425,10 +426,14 @@ class BaseTrainer:
 
     def save_model(self):
         """Save model checkpoints based on various conditions."""
+        with io.BytesIO() as f:
+            torch.save(de_parallel(self.model), f)
+            f.seek(0)
+            model = torch.load(f)
         ckpt = {
             'epoch': self.epoch,
             'best_fitness': self.best_fitness,
-            'model': deepcopy(de_parallel(self.model)).half(),
+            'model': deepcopy(model).half(),
             'ema': deepcopy(self.ema.ema).half(),
             'updates': self.ema.updates,
             'optimizer': self.optimizer.state_dict(),
@@ -449,6 +454,7 @@ class BaseTrainer:
         if (self.epoch > 0) and (self.save_period > 0) and (self.epoch % self.save_period == 0):
             torch.save(ckpt, self.wdir / f'epoch{self.epoch}.pt', pickle_module=pickle)
         del ckpt
+        del model
 
     @staticmethod
     def get_dataset(data):
