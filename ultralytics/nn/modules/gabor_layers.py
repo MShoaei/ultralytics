@@ -68,10 +68,12 @@ class GaborLayer(nn.Module):
             in_channels=self.channels1x1, out_channels=out_channels, 
             kernel_size=1, bias=bias2)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor):
         # Generate the Gabor kernels
         if not hasattr(self, 'gabor_kernels'):
             self.gabor_kernels = self.generate_gabor_kernels()
+            self.gabor_kernels = self.gabor_kernels.to(device=x.device, dtype=x.dtype)
+
 
         if self.training:
             self.gabor_kernels = self.generate_gabor_kernels()
@@ -84,6 +86,7 @@ class GaborLayer(nn.Module):
         bs, _, H, W = x.size()
         x = x.view(bs*self.in_channels, H, W).unsqueeze(dim=1)
         # Perform convolution
+        self.gabor_kernels = self.gabor_kernels.to(device=x.device, dtype=x.dtype)
         out = F.conv2d(input=x, weight=self.gabor_kernels, bias=self.bias, 
             stride=self.stride, padding=self.padding)
         if self.relu:
