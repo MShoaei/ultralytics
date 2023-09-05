@@ -283,7 +283,13 @@ class BaseTrainer:
             self.lf = one_cycle(1, self.args.lrf, self.epochs)  # cosine 1->hyp['lrf']
         else:
             self.lf = lambda x: (1 - x / self.epochs) * (1.0 - self.args.lrf) + self.args.lrf  # linear
-        self.scheduler = optim.lr_scheduler.LambdaLR(self.optimizer, lr_lambda=self.lf)
+        
+        if self.args.scheduler == "MultiStepLR":
+            self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer, self.args.multistep_lr, self.args.multistep_gamma)
+        else:
+            self.scheduler = optim.lr_scheduler.LambdaLR(self.optimizer, lr_lambda=self.lf)
+        LOGGER.info(f"{colorstr('scheduler:')} {type(self.scheduler).__name__}")
+
         self.stopper, self.stop = EarlyStopping(patience=self.args.patience), False
         self.resume_training(ckpt)
         self.scheduler.last_epoch = self.start_epoch - 1  # do not move
