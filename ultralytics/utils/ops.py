@@ -291,6 +291,7 @@ def clip_boxes(boxes, shape):
       boxes (torch.Tensor): the bounding boxes to clip
       shape (tuple): the shape of the image
     """
+    return
     if isinstance(boxes, torch.Tensor):  # faster individually
         boxes[..., 0].clamp_(0, shape[1])  # x1
         boxes[..., 1].clamp_(0, shape[0])  # y1
@@ -312,6 +313,7 @@ def clip_coords(coords, shape):
     Returns:
         (None): The function modifies the input `coordinates` in place, by clipping each coordinate to the image boundaries.
     """
+    return
     if isinstance(coords, torch.Tensor):  # faster individually
         coords[..., 0].clamp_(0, shape[1])  # x
         coords[..., 1].clamp_(0, shape[0])  # y
