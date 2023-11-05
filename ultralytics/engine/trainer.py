@@ -8,7 +8,6 @@ Usage:
 
 import math
 import os
-import io
 import subprocess
 import time
 import warnings
@@ -224,9 +223,9 @@ class BaseTrainer:
                 LOGGER.info(f"Freezing layer '{k}'")
                 v.requires_grad = False
             elif not v.requires_grad:
-                LOGGER.info(f"WARNING ⚠️ frozen layer '{k}' was not in frozen list. respecting the manual 'requires_grad=False'"
+                LOGGER.info(f"WARNING ⚠️ setting 'requires_grad=True' for frozen layer '{k}'. "
                             'See ultralytics.engine.trainer for customization of frozen layers.')
-                # v.requires_grad = True
+                v.requires_grad = True
 
         # Check AMP
         self.amp = torch.tensor(self.args.amp).to(self.device)  # True or False
@@ -429,15 +428,10 @@ class BaseTrainer:
         import pandas as pd  # scope for faster startup
         metrics = {**self.metrics, **{'fitness': self.fitness}}
         results = {k.strip(): v for k, v in pd.read_csv(self.csv).to_dict(orient='list').items()}
-
-        with io.BytesIO() as f:
-            torch.save(de_parallel(self.model), f)
-            f.seek(0)
-            model = torch.load(f)
         ckpt = {
             'epoch': self.epoch,
             'best_fitness': self.best_fitness,
-            'model': deepcopy(model).half(),
+            'model': deepcopy(de_parallel(self.model)).half(),
             'ema': deepcopy(self.ema.ema).half(),
             'updates': self.ema.updates,
             'optimizer': self.optimizer.state_dict(),
@@ -453,8 +447,6 @@ class BaseTrainer:
             torch.save(ckpt, self.best)
         if (self.save_period > 0) and (self.epoch > 0) and (self.epoch % self.save_period == 0):
             torch.save(ckpt, self.wdir / f'epoch{self.epoch}.pt')
-        del ckpt
-        del model
 
     @staticmethod
     def get_dataset(data):
