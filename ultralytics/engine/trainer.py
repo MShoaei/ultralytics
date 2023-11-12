@@ -320,7 +320,7 @@ class BaseTrainer:
 
             if RANK in (-1, 0):
                 LOGGER.info(self.progress_string())
-                pbar = TQDM(enumerate(self.train_loader), total=nb)
+                pbar = TQDM(enumerate(self.train_loader), total=len(self.train_loader))
             self.tloss = None
             self.optimizer.zero_grad()
             for i, batch in pbar:
