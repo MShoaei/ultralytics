@@ -311,7 +311,7 @@ class BaseTrainer:
             self.run_callbacks('on_train_epoch_start')
             self.model.train()
             if RANK != -1:
-                self.train_loader.sampler.set_epoch(epoch)
+                self.train_loader.set_epoch(epoch)
             pbar = enumerate(self.train_loader)
             # Update dataloader attributes (optional)
             if epoch == (self.epochs - self.args.close_mosaic):
