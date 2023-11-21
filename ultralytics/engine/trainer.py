@@ -363,8 +363,11 @@ class BaseTrainer:
                         ('%11s' * 2 + '%11.4g' * (2 + loss_len)) %
                         (f'{epoch + 1}/{self.epochs}', mem, *losses, batch['cls'].shape[0], batch['img'].shape[-1]))
                     self.run_callbacks('on_batch_end')
-                    if self.args.plots and ni in self.plot_idx:
-                        self.plot_training_samples(batch, ni)
+                    if self.args.plots: 
+                        if ni in self.plot_idx:
+                            self.plot_training_samples(batch, ni)
+                        elif self.args.plot_interval != -1 and (epoch+1)%self.args.plot_interval == 0 and i in self.plot_idx:
+                            self.plot_training_samples(batch, ni)
 
                 self.run_callbacks('on_train_batch_end')
 
