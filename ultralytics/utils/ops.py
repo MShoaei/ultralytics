@@ -269,7 +269,7 @@ def clip_boxes(boxes, shape):
     Returns:
         (torch.Tensor | numpy.ndarray): Clipped boxes
     """
-    return
+    return boxes
     if isinstance(boxes, torch.Tensor):  # faster individually (WARNING: inplace .clamp_() Apple MPS bug)
         boxes[..., 0] = boxes[..., 0].clamp(0, shape[1])  # x1
         boxes[..., 1] = boxes[..., 1].clamp(0, shape[0])  # y1
@@ -292,7 +292,7 @@ def clip_coords(coords, shape):
     Returns:
         (torch.Tensor | numpy.ndarray): Clipped coordinates
     """
-    return
+    return coords
     if isinstance(coords, torch.Tensor):  # faster individually (WARNING: inplace .clamp_() Apple MPS bug)
         coords[..., 0] = coords[..., 0].clamp(0, shape[1])  # x
         coords[..., 1] = coords[..., 1].clamp(0, shape[0])  # y
