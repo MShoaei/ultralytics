@@ -24,6 +24,7 @@ optimizer: auto  # (str) optimizer to use, choices=[SGD, Adam, Adamax, AdamW, NA
 verbose: True  # (bool) whether to print verbose output
 seed: 0  # (int) random seed for reproducibility
 plot_interval: 10 # (int) plot train batch every x epochs (-1 to plot only the first epoch)
+cell_repeat: 8 # (int) number of times to take samples from the same cell. Helps reduce I/O overhead for smaller versions of YOLO
 deterministic: True  # (bool) whether to enable deterministic mode
 single_cls: False  # (bool) train multi-class data as single-class
 rect: False  # (bool) rectangular training if mode='train' or rectangular validation if mode='val'
