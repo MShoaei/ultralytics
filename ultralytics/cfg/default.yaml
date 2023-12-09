@@ -24,7 +24,6 @@ optimizer: auto  # (str) optimizer to use, choices=[SGD, Adam, Adamax, AdamW, NA
 verbose: True  # (bool) whether to print verbose output
 seed: 0  # (int) random seed for reproducibility
 plot_interval: 10 # (int) plot train batch every x epochs (-1 to plot only the first epoch)
-cell_repeat: 8 # (int) number of times to take samples from the same cell. Helps reduce I/O overhead for smaller versions of YOLO
 deterministic: True  # (bool) whether to enable deterministic mode
 single_cls: False  # (bool) train multi-class data as single-class
 rect: False  # (bool) rectangular training if mode='train' or rectangular validation if mode='val'
@@ -36,6 +35,11 @@ amp: True  # (bool) Automatic Mixed Precision (AMP) training, choices=[True, Fal
 fraction: 1.0  # (float) dataset fraction to train on (default is 1.0, all images in train set)
 profile: False  # (bool) profile ONNX and TensorRT speeds during training for loggers
 freeze: None  # (int | list, optional) freeze first n layers, or freeze list of layer indices during training
+# Megatile Dataset
+cell_repeat: 8 # (int) number of times to take samples from the same cell. Helps reduce I/O overhead for smaller versions of YOLO
+crop: True # (bool) whether to crop lines to image boundary or not
+scale_range: [0.5, 2] # (tuple) (min, max) of scale
+
 # Segmentation
 overlap_mask: True  # (bool) masks should overlap during training (segment train only)
 mask_ratio: 4  # (int) mask downsample ratio (segment train only)
