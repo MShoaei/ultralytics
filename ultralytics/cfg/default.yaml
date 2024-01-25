@@ -39,6 +39,7 @@ freeze: None  # (int | list, optional) freeze first n layers, or freeze list of 
 cell_repeat: 8 # (int) number of times to take samples from the same cell. Helps reduce I/O overhead for smaller versions of YOLO. batch should be a multiple of this parameter
 crop: True # (bool) whether to crop lines to image boundary or not
 scale_range: [0.5, 2] # (tuple) (min, max) of scale
+grid_size_multiplier: 2 # (float) increase the size of grid cells to deacrease the total number of cells for each megatile
 
 # Segmentation
 overlap_mask: True  # (bool) masks should overlap during training (segment train only)
