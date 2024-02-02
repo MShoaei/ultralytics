@@ -19,6 +19,7 @@ import numpy as np
 import torch
 from torch import distributed as dist
 from torch import nn, optim
+from lion_pytorch import Lion
 
 from ultralytics.cfg import get_cfg, get_save_dir
 from ultralytics.data.utils import check_cls_dataset, check_det_dataset
@@ -731,12 +732,14 @@ class BaseTrainer:
             optimizer = getattr(optim, name, optim.Adam)(g[2], lr=lr, betas=(momentum, 0.999), weight_decay=0.0)
         elif name == "RMSProp":
             optimizer = optim.RMSprop(g[2], lr=lr, momentum=momentum)
+        elif name == "Lion":
+            optimizer = Lion(g[2], lr=lr)
         elif name == "SGD":
             optimizer = optim.SGD(g[2], lr=lr, momentum=momentum, nesterov=True)
         else:
             raise NotImplementedError(
                 f"Optimizer '{name}' not found in list of available optimizers "
-                f"[Adam, AdamW, NAdam, RAdam, RMSProp, SGD, auto]."
+                f"[Adam, AdamW, NAdam, RAdam, RMSProp, SGD, Lion, auto]."
                 "To request support for addition optimizers please visit https://github.com/ultralytics/ultralytics."
             )
 
