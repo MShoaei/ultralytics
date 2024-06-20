@@ -77,9 +77,6 @@ from .transformer import (
     TransformerLayer,
 )
 
-from .HT import HT, IHT, HTIHT, CAT_HTIHT, hough_transform
-from .gabor_layers import GaborLayer, GaborLayerLearnable
-
 __all__ = (
     "Conv",
     "Conv2",
