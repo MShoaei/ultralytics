@@ -1,7 +1,7 @@
 ---
 comments: true
-description: From training to tracking, make the most of YOLOv8 with Ultralytics. Get insights and examples for each supported mode including validation, export, and benchmarking.
-keywords: Ultralytics, YOLOv8, Machine Learning, Object Detection, Training, Validation, Prediction, Export, Tracking, Benchmarking
+description: Discover the diverse modes of Ultralytics YOLOv8, including training, validation, prediction, export, tracking, and benchmarking. Maximize model performance and efficiency.
+keywords: Ultralytics, YOLOv8, machine learning, model training, validation, prediction, export, tracking, benchmarking, object detection
 ---
 
 # Ultralytics YOLOv8 Modes
@@ -14,7 +14,7 @@ Ultralytics YOLOv8 is not just another object detection model; it's a versatile 
 
 <p align="center">
   <br>
-  <iframe width="720" height="405" src="https://www.youtube.com/embed/j8uQc0qB91s?si=dhnGKgqvs7nPgeaM"
+  <iframe loading="lazy" width="720" height="405" src="https://www.youtube.com/embed/j8uQc0qB91s?si=dhnGKgqvs7nPgeaM"
     title="YouTube video player" frameborder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
     allowfullscreen>

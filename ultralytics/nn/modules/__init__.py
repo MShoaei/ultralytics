@@ -13,7 +13,7 @@ Example:
     m = Conv(128, 128)
     f = f'{m._get_name()}.onnx'
     torch.onnx.export(m, x, f)
-    os.system(f'onnxsim {f} {f} && open {f}')
+    os.system(f'onnxslim {f} {f} && open {f}')  # pip install onnxslim
     ```
 """
 
@@ -23,18 +23,29 @@ from .block import (
     C3,
     C3TR,
     DFL,
+    ELAN1,
     SPP,
+    SPPELAN,
     SPPF,
+    AConv,
+    ADown,
+    BNContrastiveHead,
     Bottleneck,
     BottleneckCSP,
     C2f,
+    C2fAttn,
     C3Ghost,
     C3x,
+    CBFuse,
+    CBLinear,
+    ContrastiveHead,
     GhostBottleneck,
     HGBlock,
     HGStem,
+    ImagePoolingAttn,
     Proto,
     RepC3,
+    RepNCSPELAN4,
     ResNetLayer,
 )
 from .conv import (
@@ -52,7 +63,7 @@ from .conv import (
     RepConv,
     SpatialAttention,
 )
-from .head import OBB, Classify, Detect, Pose, RTDETRDecoder, Segment
+from .head import OBB, Classify, Detect, Pose, RTDETRDecoder, Segment, WorldDetect
 from .transformer import (
     AIFI,
     MLP,
@@ -96,6 +107,7 @@ __all__ = (
     "C2",
     "C3",
     "C2f",
+    "C2fAttn",
     "C3x",
     "C3TR",
     "C3Ghost",
@@ -117,11 +129,15 @@ __all__ = (
     "MLP",
     "ResNetLayer",
     "OBB",
-    'HT',
-    'IHT',
-    'HTIHT',
-    'CAT_HTIHT',
-    'hough_transform',
-    'GaborLayer',
-    'GaborLayerLearnable',
+    "WorldDetect",
+    "ImagePoolingAttn",
+    "ContrastiveHead",
+    "BNContrastiveHead",
+    "RepNCSPELAN4",
+    "ADown",
+    "SPPELAN",
+    "CBFuse",
+    "CBLinear",
+    "AConv",
+    "ELAN1",
 )
